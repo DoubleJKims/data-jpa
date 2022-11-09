@@ -17,7 +17,7 @@ public class Team {
 
     @GeneratedValue @Id
     @Column(name = "team_id")
-    private long team;
+    private long id;
     private String name;
 
     @OneToMany(mappedBy = "team")
