@@ -100,4 +100,20 @@ class MemberRepositoryTest {
     void findTop3HelloBy() throws Exception {
         List<Member> helloBy = memberRepository.findTop3HelloBy();
     }
+
+    @Test
+    @DisplayName("testQuery")
+    void testQuery() throws Exception {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("AAA", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> result = memberRepository.findUser("AAA", 10);
+
+        assertThat(result.get(0)).isEqualTo(m1);
+        assertThat(result.get(0).getUsername()).isEqualTo("AAA");
+        assertThat(result.get(0).getAge()).isEqualTo(20);
+        assertThat(result.size()).isEqualTo(1);
+    }
 }
