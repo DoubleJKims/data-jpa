@@ -88,4 +88,16 @@ class MemberRepositoryTest {
         assertThat(result.get(0).getAge()).isEqualTo(20);
         assertThat(result.size()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("findHelloBy")
+    void findHelloBy() throws Exception {
+        List<Member> helloBy = memberRepository.findHelloBy();
+    }
+
+    @Test
+    @DisplayName("findTop3HelloBy")
+    void findTop3HelloBy() throws Exception {
+        List<Member> helloBy = memberRepository.findTop3HelloBy();
+    }
 }
