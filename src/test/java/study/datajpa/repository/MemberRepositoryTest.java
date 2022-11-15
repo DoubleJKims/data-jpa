@@ -163,7 +163,29 @@ class MemberRepositoryTest {
         for (Member member : result) {
             System.out.println("member = " + member);
         }
+    }
 
+    @Test
+    @DisplayName("returnTypeTest")
+    void returnTypeTest() throws Exception {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("AAA", 20);
+        Member m3 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+        memberRepository.save(m3);
+
+        List<Member> ListByUsername = memberRepository.findListByUsername("AAA");
+        List<Member> ListByUsername2 = memberRepository.findListByUsername("asdfasdf");
+        System.out.println("ListByUsername2 size = " + ListByUsername2.size());
+
+        Member memberByUsername = memberRepository.findMemberByUsername("BBB");
+        Member memberByUsername2 = memberRepository.findMemberByUsername("asdfasdf");
+        System.out.println("memberByUsername2 = " + memberByUsername2);
+
+        //org.springframework.dao.IncorrectResultSizeDataAccessException: query did not return a unique result: 2;
+        Optional<Member> optionalByUsername = memberRepository.findOptionalByUsername("AAA");
+        System.out.println("optionalByUsername = " + optionalByUsername);
     }
 
 }
