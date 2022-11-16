@@ -14,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
-
+    @PersistenceContext EntityManager em;
     @Test
     public void testMember() {
 
@@ -253,5 +255,43 @@ class MemberRepositoryTest {
 
         //then
         assertThat(resultCount).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("findMemberLazy")
+    void findMemberLazy() throws Exception {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> all = memberRepository.findAll();
+
+        for (Member member : all) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); //가짜 객체  class study.datajpa.entity.Team$HibernateProxy$cW80nZmh
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
+
+        List<Member> memberFetchJoin = memberRepository.findMemberFetchJoin();
+        for (Member member : memberFetchJoin) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); //진짜 객체  class study.datajpa.entity.Team
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
+
+        List<Member> memberEntityGraph = memberRepository.findEntityGraphByUsername("member1");
     }
 }
