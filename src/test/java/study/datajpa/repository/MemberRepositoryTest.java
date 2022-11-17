@@ -294,4 +294,34 @@ class MemberRepositoryTest {
 
         List<Member> memberEntityGraph = memberRepository.findEntityGraphByUsername("member1");
     }
+
+    @Test
+    @DisplayName("queryHint")
+    void queryHint() throws Exception {
+        //given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush(); //영속성컨텍스트(1차 캐시)에 데이터 남아있음
+        em.clear(); //영속성컨텍스트 초기화 및 다음 트랜잭션에서 DB 조회
+        Long id = member1.getId();
+
+        //when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.changeUsername("member2");
+
+        em.flush();
+    }
+
+    @Test
+    @DisplayName("lock")
+    void lock() throws Exception {
+        //given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush(); //영속성컨텍스트(1차 캐시)에 데이터 남아있음
+        em.clear(); //영속성컨텍스트 초기화 및 다음 트랜잭션에서 DB 조회
+
+        //when
+        Member findMember = memberRepository.findLockByUsername("member1");
+    }
 }
