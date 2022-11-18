@@ -2,14 +2,17 @@ package study.datajpa.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.repository.MemberRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberTest {
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("testEntity")
@@ -49,7 +55,31 @@ class MemberTest {
             System.out.println("member = " + member);
             System.out.println("-> member.team = " + member.getTeam());
         }
-        //then
-
     }
+
+    @Test
+    @DisplayName("jpaEventBaseEntity")
+    void jpaEventBaseEntity() throws Exception {
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member); //@PrePersist 발생
+
+        Thread.sleep(100);
+        member.changeUsername("member2");
+
+        em.flush(); //@PreUpdate 발생
+        em.clear();
+
+        //when
+        Optional<Member> byId = memberRepository.findById(member.getId());
+        Member findMember = byId.get();
+
+        //then
+        System.out.println("findMember createDate = " + findMember.getCreateDate());
+        //System.out.println("findMember updateDate = " + findMember.getUpdateDate());
+        System.out.println("findMember updateDate = " + findMember.getLastModifiedDate());
+        System.out.println("findMember createdBy = " + findMember.getCreatedBy());
+        System.out.println("findMember updatedBy = " + findMember.getLastModifiedBy());
+    }
+
 }
