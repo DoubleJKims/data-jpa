@@ -210,7 +210,7 @@ class MemberRepositoryTest {
         //when
         Page<Member> page = memberRepository.findPageByAge(age, pageRequest);
 
-        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+        Page<MemberDto> toMap = page.map(member -> new  MemberDto(member.getId(), member.getUsername(), null));
 
         //then
         List<Member> content = page.getContent();
