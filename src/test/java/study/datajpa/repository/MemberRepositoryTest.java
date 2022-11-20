@@ -4,10 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -330,12 +327,36 @@ class MemberRepositoryTest {
     void callCustomRepository() throws Exception {
         //given
         List<Member> result = memberRepository.findMemberCustom();
+    }
 
+    @Test
+    @DisplayName("Query By Example")
+    void queryByExample() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 0, teamA);
+        Member m2 = new Member("m2", 0, teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
         //when
 
-
         //then
+        Member member = new Member("m1");
+        Team team = new Team("teamA");
+        member.changeTeam(team);
 
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnorePaths("age");
 
+        Example<Member> example = Example.of(member, matcher);
+
+        List<Member> result = memberRepository.findAll(example);
+
+        assertThat(result.get(0).getUsername()).isEqualTo("m1");
     }
 }
